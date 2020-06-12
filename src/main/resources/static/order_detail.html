@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>订单详情</title>
+</head>
+<body>
+<div class="panel panel-default">
+    <div class="panel-heading">秒杀订单详情</div>
+    <table class="table" id="goodslist">
+        <tr>
+            <td>商品名称</td>
+            <td id="goodsName" colspan="3"></td>
+        </tr>
+        <tr>
+            <td>商品图片</td>
+            <td colspan="2"><img id="goodsImg" width="200" height="200"/></td>
+        </tr>
+        <tr>
+            <td>订单价格</td>
+            <td colspan="2" id="goodsPrice"></td>
+        </tr>
+        <tr>
+            <td>下单时间</td>
+            <td id="createDate" colspan="2"></td>
+        </tr>
+        <tr>
+            <td>订单状态</td>
+            <td id="status">
+            </td>
+            <td>
+                <button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
+            </td>
+        </tr>
+        <tr>
+            <td>收货人</td>
+            <td colspan="2">XXX 18812341234</td>
+        </tr>
+        <tr>
+            <td>收货地址</td>
+            <td colspan="2">北京市昌平区回龙观龙博一区</td>
+        </tr>
+    </table>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="jquery-validation/jquery.validate.min.js"></script>
+<script type="text/javascript" src="jquery-validation/localization/messages_zh.min.js"></script>
+<script type="text/javascript" src="layer/layer.js"></script>
+<script type="text/javascript" src="js/md5.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+
+<script>
+    $(function () {
+        getOrder();
+    });
+
+    function getOrder() {
+        $.ajax({
+            url: server_local + "order/detail/" + g_getQueryString("orderId"),
+            type: "GET",
+            headers: {
+                'token': $.cookie("token")
+            },
+            success: function (data) {
+                if (data.code === 0) {
+                    render(data.data);
+                } else {
+                    layer.msg(data.msg);
+                }
+            }, error: function () {
+                layer.msg("连接服务器异常");
+            }
+        })
+    }
+
+    function render(detail) {
+        $("#goodsName").text(detail.orderInfo.goodsName);
+        $("#goodsImg").attr("src", detail.goodsVo.goodsImg);
+        $("#goodsPrice").text(detail.orderInfo.goodsPrice);
+        $("#createDate").text(new Date(detail.orderInfo.createDate).format("yyyy-MM-dd hh:mm:ss"));
+        var statusStr = ["未支付", "已支付", "已发货", "已收货", "已退款", "已完成"];
+        $("#status").text(statusStr[detail.orderInfo.status]);
+
+
+    }
+</script>
+</html>
